@@ -17,8 +17,8 @@ CAR_SIZE = 6
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Topdown Road Editor")
 
-car_pos = [400, 300]
-car_angle = 0
+car_pos = [400, 85]
+car_angle = 180
 
 clock = pygame.time.Clock()
 
