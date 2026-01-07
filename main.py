@@ -15,7 +15,7 @@ TURN_SPEED = 3
 CAR_SIZE = 6
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Topdown Road Editor")
+pygame.display.set_caption("Topdown Car Simulation")
 
 car_pos = [400, 85]
 car_angle = 180
