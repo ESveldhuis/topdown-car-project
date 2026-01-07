@@ -59,6 +59,43 @@ def draw_car(car_pos, car_angle):
     )
     pygame.draw.line(screen, (255, 0, 0), car_pos, tip, 2)
 
+def ray_segment_intersection(ray_origin, ray_dir, point1, point2):
+    origin_x, origin_y = ray_origin
+    ray_x, ray_y = ray_dir
+    x1, y1 = point1
+    x2, y2 = point2
+
+    edge_x = x2 - x1
+    edge_y = y2 - y1
+
+    denom = ray_x * edge_y - ray_y * edge_x
+    if denom == 0:
+        return None  # parallel
+
+    t = ((x1 - origin_x) * edge_y - (y1 - origin_y) * edge_x) / denom
+    u = ((x1 - origin_x) * ray_y - (y1 - origin_y) * ray_x) / denom
+
+    if t >= 0 and 0 <= u <= 1:
+        return t  # afstand langs ray
+    
+    return None
+
+def calculate_distance_to_road(point, angle):
+    rad = math.radians(angle)
+    ray_dir = (math.cos(rad), math.sin(rad))
+
+    min_dist = None
+
+    for edge in (left_edge, right_edge):
+        for i in range(len(edge) - 1):
+            dist = ray_segment_intersection(point, ray_dir, edge[i], edge[i + 1])
+
+            if dist is not None:
+                if min_dist is None or dist < min_dist:
+                    min_dist = dist
+
+    return min_dist
+
 running = True
 while running:
     clock.tick(30)
@@ -71,6 +108,14 @@ while running:
     draw_road()
     car_pos, car_angle = detect_car_controls(car_pos, car_angle)
     draw_car(car_pos, car_angle)
+    dist = calculate_distance_to_road(car_pos, car_angle)
+
+    if dist:
+        end = (
+            car_pos[0] + math.cos(math.radians(car_angle)) * dist,
+            car_pos[1] + math.sin(math.radians(car_angle)) * dist
+        )
+        pygame.draw.line(screen, (255, 255, 0), car_pos, end, 2)
 
     pygame.display.flip()
 
