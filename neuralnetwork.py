@@ -4,6 +4,7 @@ class Network:
     def __init__(self, number_of_input_neurons, output_neurons):
         self.layers = [[Neuron() for _ in range(number_of_input_neurons)]]
         self.output_layer = [Neuron() for _ in range(output_neurons)]
+        self.output_values = []
 
     def set_input_values(self, list_of_input_values):
         if len(self.layers[0]) == len(list_of_input_values):
@@ -41,11 +42,20 @@ class Network:
         #change_random_weight
         #change_random_bias
         #split_random_conection
-        pass
+        
+    def calculate_output(self):
+        self.output_values = []
+        for layer in self.layers:
+            for neuron in layer:
+                neuron.calculate_value()
+        for neuron in self.output_layer:
+            neuron.calculate_value()
+            self.output_values.append(neuron.value)
+
 
 class Neuron:
     def __init__(self):
-        self.value = 0
+        self.value = 0.0
         self.input_conections = []  # lijst van tuples (Neuron, weight)
         self.bias = 0.0
     
@@ -53,16 +63,20 @@ class Neuron:
         self.input_conections.append((input_neuron, input_weight))
 
     def calculate_value(self):
-        self.value = 0
+        if len(self.input_conections) == 0:
+            return
+        self.value = self.bias
         for conection in self.input_conections:
             self.value += conection[0].value * conection[1]
-        return self.value
     
 # network1 = Network(3, 4)
 # input_values = [1,2,3]
 # network1.set_input_values(input_values)
 
-# network1.mutate()
+# for i in range(10):
+#     network1.mutate()
 
-# for i in network1.output_layer:
-#     print(i.input_conections)
+# network1.calculate_output()
+
+# for value in network1.output_values:
+#     print(value)
