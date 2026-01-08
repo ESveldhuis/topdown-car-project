@@ -1,3 +1,5 @@
+import random
+
 class Network:
     def __init__(self, number_of_input_neurons, output_neurons):
         self.layers = [[Neuron() for _ in range(number_of_input_neurons)]]
@@ -22,6 +24,25 @@ class Network:
             case _:
                 self.layers[layer].append(Neuron())
 
+    def add_random_conection(self):
+        target_neuron_layer_index = random.randint(1, len(self.layers))     #select random layer for target neuron (first hidden layer, output layer)
+        if target_neuron_layer_index == len(self.layers):
+            target_neuron_layer = self.output_layer
+        else:
+            target_neuron_layer = self.layers[target_neuron_layer_index]
+        target_neuron = target_neuron_layer[random.randint(0, len(target_neuron_layer) - 1)]       #select random neuron in chosen layer
+        input_neuron_layer = self.layers[random.randint(0, target_neuron_layer_index - 1)]      #select random layer for input neuron (inputlayer, layer before target neuron)
+        input_neuron = input_neuron_layer[random.randint(0, len(input_neuron_layer) - 1)]
+        target_neuron.add_conection(input_neuron, random.uniform(-0.1, 0.1))
+
+
+    def mutate(self):
+        self.add_random_conection()
+        #change_random_weight
+        #change_random_bias
+        #split_random_conection
+        pass
+
 class Neuron:
     def __init__(self):
         self.value = 0
@@ -41,5 +62,7 @@ class Neuron:
 # input_values = [1,2,3]
 # network1.set_input_values(input_values)
 
-# network1.add_hidden_layer()
-# network1.add_neuron_to_layer(1)
+# network1.mutate()
+
+# for i in network1.output_layer:
+#     print(i.input_conections)
