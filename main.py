@@ -96,6 +96,23 @@ def calculate_distance_to_road(point, angle):
 
     return min_dist
 
+def draw_ray(angle, dist):
+    if dist:
+        end = (
+            car_pos[0] + math.cos(math.radians(angle)) * dist,
+            car_pos[1] + math.sin(math.radians(angle)) * dist
+        )
+        pygame.draw.line(screen, (255, 255, 0), car_pos, end, 2)
+
+def get_input(car_pos, car_angle):
+    input_layer = []
+    ray = -40
+    while ray <= 40:
+        dist = calculate_distance_to_road(car_pos, car_angle + ray)
+        input_layer.append(dist)
+        draw_ray(car_angle + ray, dist)
+        ray += 20
+
 running = True
 while running:
     clock.tick(30)
@@ -108,14 +125,7 @@ while running:
     draw_road()
     car_pos, car_angle = detect_car_controls(car_pos, car_angle)
     draw_car(car_pos, car_angle)
-    dist = calculate_distance_to_road(car_pos, car_angle)
-
-    if dist:
-        end = (
-            car_pos[0] + math.cos(math.radians(car_angle)) * dist,
-            car_pos[1] + math.sin(math.radians(car_angle)) * dist
-        )
-        pygame.draw.line(screen, (255, 255, 0), car_pos, end, 2)
+    get_input(car_pos, car_angle)
 
     pygame.display.flip()
 
