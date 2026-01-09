@@ -75,7 +75,6 @@ class Network:
             self.layers.insert(target_neuron_layer_index, [split_neuron])
         else:
             self.layers[middle_layer_index].append(split_neuron)
-        print(self.layers)
 
     def mutate(self):
         self.add_random_conection()
