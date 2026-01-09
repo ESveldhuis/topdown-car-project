@@ -36,6 +36,28 @@ class Network:
         input_neuron = input_neuron_layer[random.randint(0, len(input_neuron_layer) - 1)]
         target_neuron.add_conection(input_neuron, random.uniform(-0.1, 0.1))
 
+    def change_random_weight(self):
+        attempts = 0
+        while True:
+            target_neuron_layer_index = random.randint(1, len(self.layers))     #select random layer for target neuron (first hidden layer, output layer)
+            if target_neuron_layer_index == len(self.layers):
+                target_neuron_layer = self.output_layer
+            else:
+                target_neuron_layer = self.layers[target_neuron_layer_index]
+            target_neuron = target_neuron_layer[random.randint(0, len(target_neuron_layer) - 1)]       #select random neuron in chosen layer
+
+            if len(target_neuron.input_conections) > 0:     #only continu if you found a neuron with at least 1 input conection
+                break
+            attempts += 1
+            if attempts > 5:        #if after 5 attempts you stil didn't find a neuron with a conection just add a conection 
+                self.add_random_conection()
+                break
+        if attempts > 5:
+            return
+        target_conection_index = random.randint(0, len(target_neuron.input_conections) - 1)
+        target_conection = target_neuron.input_conections[target_conection_index]
+        target_neuron.input_conections[target_conection_index] = (target_conection[0], target_conection[1] + random.uniform(-0.1, 0.1))
+
     def split_random_conection(self):
         attempts = 0
         while True:
@@ -78,7 +100,7 @@ class Network:
 
     def mutate(self):
         self.add_random_conection()
-        #change_random_weight
+        self.change_random_weight()
         #change_random_bias
         self.split_random_conection()
         
