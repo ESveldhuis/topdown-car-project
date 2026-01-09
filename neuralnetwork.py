@@ -36,12 +36,52 @@ class Network:
         input_neuron = input_neuron_layer[random.randint(0, len(input_neuron_layer) - 1)]
         target_neuron.add_conection(input_neuron, random.uniform(-0.1, 0.1))
 
+    def split_random_conection(self):
+        attempts = 0
+        while True:
+            target_neuron_layer_index = random.randint(1, len(self.layers))     #select random layer for target neuron (first hidden layer, output layer)
+            if target_neuron_layer_index == len(self.layers):
+                target_neuron_layer = self.output_layer
+            else:
+                target_neuron_layer = self.layers[target_neuron_layer_index]
+            target_neuron = target_neuron_layer[random.randint(0, len(target_neuron_layer) - 1)]       #select random neuron in chosen layer
+
+            if len(target_neuron.input_conections) > 0:     #only continu if you found a neuron with at least 1 input conection
+                break
+            attempts += 1
+            if attempts > 5:        #if after 5 attempts you stil didn't find a neuron with a conection just add a conection 
+                self.add_random_conection()
+                break
+        if attempts > 5:
+            return
+        target_conection = target_neuron.input_conections[random.randint(0, len(target_neuron.input_conections) - 1)]
+        input_neuron = target_conection[0]
+        split_neuron = Neuron()
+        split_neuron.add_conection(input_neuron, random.uniform(-0.1, 0.1))
+        target_neuron.add_conection(split_neuron, random.uniform(-0.1, 0.1))
+        target_neuron.input_conections.remove(target_conection)
+        layer_index = 0
+        input_neuron_layer_index = None
+        for layer in self.layers:
+            for neuron in layer:
+                if neuron == input_neuron:
+                    input_neuron_layer_index = layer_index
+                    break
+            if not input_neuron_layer_index == None:
+                break
+            layer_index += 1
+        middle_layer_index = round((input_neuron_layer_index + target_neuron_layer_index) / 2)
+        if middle_layer_index == input_neuron_layer_index or middle_layer_index == target_neuron_layer_index:
+            self.layers.insert(target_neuron_layer_index, [split_neuron])
+        else:
+            self.layers[middle_layer_index].append(split_neuron)
+        print(self.layers)
 
     def mutate(self):
         self.add_random_conection()
         #change_random_weight
         #change_random_bias
-        #split_random_conection
+        self.split_random_conection()
         
     def calculate_output(self):
         self.output_values = []
@@ -51,7 +91,6 @@ class Network:
         for neuron in self.output_layer:
             neuron.calculate_value()
             self.output_values.append(neuron.value)
-
 
 class Neuron:
     def __init__(self):
