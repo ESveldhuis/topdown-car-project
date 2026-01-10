@@ -108,10 +108,21 @@ class Network:
             self.layers[middle_layer_index].append(split_neuron)
 
     def mutate(self):
-        self.add_random_conection()
-        self.change_random_weight()
-        self.change_random_bias()
-        self.split_random_conection()
+        mutations = [
+            (self.add_random_conection, 0.30),
+            (self.change_random_weight, 0.25),
+            (self.change_random_bias, 0.25),
+            (self.split_random_conection, 0.20)
+        ]
+
+        r = random.random()
+        cumulative = 0.0
+        print(r)
+        for mutation, chance in mutations:
+            cumulative += chance
+            if r < cumulative:
+                mutation()
+                break
         
     def calculate_output(self):
         self.output_values = []
