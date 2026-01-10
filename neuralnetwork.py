@@ -10,7 +10,10 @@ class Network:
     def set_input_values(self, list_of_input_values):
         if len(self.layers[0]) == len(list_of_input_values):
             for i in range(len(self.layers[0])):
-                self.layers[0][i].value = list_of_input_values[i]
+                if list_of_input_values[i] == None:
+                    self.layers[0][i].value = 0
+                else:
+                    self.layers[0][i].value = list_of_input_values[i]
         else:
             print("\033[31mERROR: list of input values is not equal to number of input leurons\033[0m")
 
