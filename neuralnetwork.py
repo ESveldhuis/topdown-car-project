@@ -118,7 +118,7 @@ class Network:
 
         r = random.random()
         cumulative = 0.0
-        print(r)
+        
         for mutation, chance in mutations:
             cumulative += chance
             if r < cumulative:
