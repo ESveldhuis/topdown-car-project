@@ -14,10 +14,10 @@ class Network:
         else:
             print("\033[31mERROR: list of input values is not equal to number of input leurons\033[0m")
 
-    def add_hidden_layer(self):
+    def add_hidden_layer(self):     #function for debuging
         self.layers.append([])
 
-    def add_neuron_to_layer(self, layer):
+    def add_neuron_to_layer(self, layer):       #function for debuging
         match layer:
             case 0:
                 print("\033[31mERROR: can't add a neuron to input layer\033[0m")
@@ -143,7 +143,7 @@ class Neuron:
     def add_conection(self, input_neuron, input_weight):
         self.input_conections.append((input_neuron, input_weight))
 
-    def sigmoid(x):
+    def sigmoid(self, x):
         if x >= 0:
             return 1 / (1 + math.exp(-x))
         else:
