@@ -1,4 +1,5 @@
 import random
+import math
 
 class Network:
     def __init__(self, number_of_input_neurons, output_neurons):
@@ -142,12 +143,20 @@ class Neuron:
     def add_conection(self, input_neuron, input_weight):
         self.input_conections.append((input_neuron, input_weight))
 
+    def sigmoid(x):
+        if x >= 0:
+            return 1 / (1 + math.exp(-x))
+        else:
+            e = math.exp(x)
+            return e / (1 + e)
+
     def calculate_value(self):
         if len(self.input_conections) == 0:
             return
         self.value = self.bias
         for conection in self.input_conections:
             self.value += conection[0].value * conection[1]
+        self.value = self.sigmoid(self.value)
     
 # network1 = Network(3, 4)
 # input_values = [1,2,3]
