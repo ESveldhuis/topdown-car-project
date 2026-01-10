@@ -17,11 +17,6 @@ CAR_SIZE = 6
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Topdown Car Simulation")
 
-car_pos = [400, 85]
-car_angle = 180
-
-clock = pygame.time.Clock()
-
 def draw_road():
     if len(left_edge) < 2 or len(right_edge) < 2:
         return
@@ -29,35 +24,50 @@ def draw_road():
     road_polygon = left_edge + right_edge[::-1]
     pygame.draw.polygon(screen, ROAD_COLOR, road_polygon)
 
+def move_forward(personal_car_pos, personal_car_angle):
+    rad = math.radians(personal_car_angle)
+    personal_car_pos[0] += math.cos(rad) * MOVE_SPEED
+    personal_car_pos[1] += math.sin(rad) * MOVE_SPEED
+    return personal_car_pos, personal_car_angle
+
+def move_back(personal_car_pos, personal_car_angle):
+    rad = math.radians(personal_car_angle)
+    personal_car_pos[0] -= math.cos(rad) * MOVE_SPEED
+    personal_car_pos[1] -= math.sin(rad) * MOVE_SPEED
+    return personal_car_pos, personal_car_angle
+
+def turn_right(personal_car_pos, personal_car_angle):
+    personal_car_angle += TURN_SPEED
+    return personal_car_pos, personal_car_angle
+
+def turn_left(personal_car_pos, personal_car_angle):
+    personal_car_angle -= TURN_SPEED
+    return personal_car_pos, personal_car_angle
+
 def detect_car_controls(car_pos, car_angle):
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_LEFT]:
-        car_angle -= TURN_SPEED
+        car_pos, car_angle = turn_left(car_pos, car_angle)
     if keys[pygame.K_RIGHT]:
-        car_angle += TURN_SPEED
+        car_pos, car_angle = turn_right(car_pos, car_angle)
 
     if keys[pygame.K_UP]:
-        rad = math.radians(car_angle)
-        car_pos[0] += math.cos(rad) * MOVE_SPEED
-        car_pos[1] += math.sin(rad) * MOVE_SPEED
+        car_pos, car_angle = move_forward(car_pos, car_angle)
 
     if keys[pygame.K_DOWN]:
-        rad = math.radians(car_angle)
-        car_pos[0] -= math.cos(rad) * MOVE_SPEED
-        car_pos[1] -= math.sin(rad) * MOVE_SPEED
-
+        car_pos, car_angle = move_back(car_pos, car_angle)
     return car_pos, car_angle
 
-def draw_car(car_pos, car_angle):
-    pygame.draw.circle(screen, CAR_COLOR, car_pos, CAR_SIZE)
+def draw_car(personal_car_pos, personal_car_angle):
+    pygame.draw.circle(screen, CAR_COLOR, personal_car_pos, CAR_SIZE)
 
-    rad = math.radians(car_angle)
+    rad = math.radians(personal_car_angle)
     tip = (
-        car_pos[0] + math.cos(rad) * 15,
-        car_pos[1] + math.sin(rad) * 15
+        personal_car_pos[0] + math.cos(rad) * 15,
+        personal_car_pos[1] + math.sin(rad) * 15
     )
-    pygame.draw.line(screen, (255, 0, 0), car_pos, tip, 2)
+    pygame.draw.line(screen, (255, 0, 0), personal_car_pos, tip, 2)
 
 def ray_segment_intersection(ray_origin, ray_dir, point1, point2):
     origin_x, origin_y = ray_origin
@@ -96,7 +106,7 @@ def calculate_distance_to_road(point, angle):
 
     return min_dist
 
-def draw_ray(angle, dist):
+def draw_ray(angle, dist, car_pos):
     if dist:
         end = (
             car_pos[0] + math.cos(math.radians(angle)) * dist,
@@ -104,30 +114,41 @@ def draw_ray(angle, dist):
         )
         pygame.draw.line(screen, (255, 255, 0), car_pos, end, 2)
 
-def get_input(car_pos, car_angle):
-    input_layer = []
+def get_input(personal_car_pos, personal_car_angle):
+    input_values = []
     ray = -40
     while ray <= 40:
-        dist = calculate_distance_to_road(car_pos, car_angle + ray)
-        input_layer.append(dist)
-        draw_ray(car_angle + ray, dist)
+        dist = calculate_distance_to_road(personal_car_pos, personal_car_angle + ray)
+        input_values.append(dist)
+        draw_ray(personal_car_angle + ray, dist, personal_car_pos)
         ray += 20
+    return input_values
 
-running = True
-while running:
-    clock.tick(30)
+def render_game(personal_car_pos, personal_car_angle):
     screen.fill(BG_COLOR)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
     draw_road()
-    car_pos, car_angle = detect_car_controls(car_pos, car_angle)
-    draw_car(car_pos, car_angle)
-    get_input(car_pos, car_angle)
-
+    draw_car(personal_car_pos, personal_car_angle)
     pygame.display.flip()
+    return get_input(personal_car_pos, personal_car_angle)
 
-pygame.quit()
-sys.exit()
+if __name__ == "__main__":
+    clock = pygame.time.Clock()
+    car_pos = [400, 85]
+    car_angle = 180
+    running = True
+    while running:
+        clock.tick(30)
+        screen.fill(BG_COLOR)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        draw_road()
+        car_pos, car_angle = detect_car_controls(car_pos, car_angle)
+        draw_car(car_pos, car_angle)
+
+        pygame.display.flip()
+
+    pygame.quit()
+    sys.exit()
