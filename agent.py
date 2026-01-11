@@ -2,7 +2,7 @@ from  neuralnetwork import Network
 import main as game
 import time
 
-class agent_class():
+class Agent():
     def __init__(self):
         self.car_pos = [400, 85]
         self.car_angle = 180
@@ -31,7 +31,7 @@ class agent_class():
         self.score = 0
         self.game_over = False
 
-agents = [agent_class() for _ in range(100)]
+agents = [Agent() for _ in range(100)]
 for agent in agents:
     i = 0
     while not agent.game_over and i < 200:
