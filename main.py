@@ -24,40 +24,86 @@ def draw_road():
     road_polygon = left_edge + right_edge[::-1]
     pygame.draw.polygon(screen, ROAD_COLOR, road_polygon)
 
-def move_forward(personal_car_pos, personal_car_angle):
+def check_for_game_over(car_pos):
+    distance_to_road_edge = calculate_distance_to_road_edge(car_pos)
+    if distance_to_road_edge < CAR_SIZE:
+        return True
+    else:
+        return False
+
+def calculate_distance_to_road_edge(car_pos):
+    smalest_distance = None
+
+    for edge in (left_edge, right_edge):
+        for i in range(len(edge) - 1):
+            distance_to_segment = calculate_distance_to_segment(car_pos, edge[i], edge[i + 1])
+            if smalest_distance is None or distance_to_segment < smalest_distance:
+                smalest_distance = distance_to_segment
+    return smalest_distance
+
+def calculate_distance_to_segment(car_pos, segment_point_1, segment_point_2):
+    car_pos_x, car_pos_y = car_pos
+    segment_point_1_x, segment_point_1_y = segment_point_1
+    segment_point_2_x, segment_point_2_y = segment_point_2
+
+    segment_x_diference = segment_point_2_x - segment_point_1_x
+    segment_y_diference = segment_point_2_y - segment_point_1_y
+    car_pos_point_1_x_diference = car_pos_x - segment_point_1_x
+    car_pos_point_1_y_diference = car_pos_y - segment_point_1_y
+
+    segment_length_square = segment_x_diference*segment_x_diference + segment_y_diference*segment_y_diference
+    if segment_length_square == 0: #if segment length == 0
+        return math.hypot(car_pos_point_1_x_diference, car_pos_point_1_y_diference)
+
+    t = (car_pos_point_1_x_diference*segment_x_diference + car_pos_point_1_y_diference*segment_y_diference) / segment_length_square
+    t = max(0, min(1, t))
+
+    closest_x = segment_point_1_x + t * segment_x_diference
+    closest_y = segment_point_1_y + t * segment_y_diference
+
+    return math.hypot(car_pos_x - closest_x, car_pos_y - closest_y)
+
+def move_forward(personal_car_pos, personal_car_angle, personal_score):
+    personal_score += 1
     rad = math.radians(personal_car_angle)
     personal_car_pos[0] += math.cos(rad) * MOVE_SPEED
     personal_car_pos[1] += math.sin(rad) * MOVE_SPEED
-    return personal_car_pos, personal_car_angle
+    game_over = check_for_game_over(personal_car_pos)
+    return personal_car_pos, personal_car_angle, personal_score, game_over
 
-def move_back(personal_car_pos, personal_car_angle):
+def move_back(personal_car_pos, personal_car_angle, personal_score):
+    personal_score -= 1
     rad = math.radians(personal_car_angle)
     personal_car_pos[0] -= math.cos(rad) * MOVE_SPEED
     personal_car_pos[1] -= math.sin(rad) * MOVE_SPEED
-    return personal_car_pos, personal_car_angle
+    game_over = check_for_game_over(personal_car_pos)
+    return personal_car_pos, personal_car_angle, personal_score, game_over
 
-def turn_right(personal_car_pos, personal_car_angle):
+def turn_right(personal_car_pos, personal_car_angle, personal_score):
     personal_car_angle += TURN_SPEED
-    return personal_car_pos, personal_car_angle
+    game_over = check_for_game_over(personal_car_pos)
+    return personal_car_pos, personal_car_angle, personal_score, game_over
 
-def turn_left(personal_car_pos, personal_car_angle):
+def turn_left(personal_car_pos, personal_car_angle, personal_score):
     personal_car_angle -= TURN_SPEED
-    return personal_car_pos, personal_car_angle
+    game_over = check_for_game_over(personal_car_pos)
+    return personal_car_pos, personal_car_angle, personal_score, game_over
 
-def detect_car_controls(car_pos, car_angle):
+def detect_car_controls(car_pos, car_angle, score):
+    game_over = False
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_LEFT]:
-        car_pos, car_angle = turn_left(car_pos, car_angle)
+        car_pos, car_angle, score, game_over = turn_left(car_pos, car_angle, score)
     if keys[pygame.K_RIGHT]:
-        car_pos, car_angle = turn_right(car_pos, car_angle)
+        car_pos, car_angle, score, game_over = turn_right(car_pos, car_angle, score)
 
     if keys[pygame.K_UP]:
-        car_pos, car_angle = move_forward(car_pos, car_angle)
+        car_pos, car_angle, score, game_over = move_forward(car_pos, car_angle, score)
 
     if keys[pygame.K_DOWN]:
-        car_pos, car_angle = move_back(car_pos, car_angle)
-    return car_pos, car_angle
+        car_pos, car_angle, score, game_over = move_back(car_pos, car_angle, score)
+    return car_pos, car_angle, score, game_over
 
 def draw_car(personal_car_pos, personal_car_angle):
     pygame.draw.circle(screen, CAR_COLOR, personal_car_pos, CAR_SIZE)
@@ -135,8 +181,10 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()
     car_pos = [400, 85]
     car_angle = 180
+    score = 0
+    game_over = False
     running = True
-    while running:
+    while running and not game_over:
         clock.tick(30)
         screen.fill(BG_COLOR)
 
@@ -145,7 +193,7 @@ if __name__ == "__main__":
                 running = False
 
         draw_road()
-        car_pos, car_angle = detect_car_controls(car_pos, car_angle)
+        car_pos, car_angle, score, game_over = detect_car_controls(car_pos, car_angle, score)
         draw_car(car_pos, car_angle)
 
         pygame.display.flip()
