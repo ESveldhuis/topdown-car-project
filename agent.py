@@ -28,6 +28,15 @@ class Agent():
     def render_game(self):
         game.render_game(self.car_pos, self.car_angle)
 
+    def render_full_game(self, max_game_cycles):
+        self.reset_game()
+        cycle = 0
+        while not self.game_over and cycle < max_game_cycles:
+            self.cycle()
+            self.render_game()
+            time.sleep(0.03)
+            cycle += 1
+
     def reset_game(self):
         self.car_pos = [400, 85]
         self.car_angle = 180
