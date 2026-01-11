@@ -25,6 +25,12 @@ class agent_class():
     def render_game(self):
         game.render_game(self.car_pos, self.car_angle)
 
+    def reset_game(self):
+        self.car_pos = [400, 85]
+        self.car_angle = 180
+        self.score = 0
+        self.game_over = False
+
 # agents = [agent_class() for _ in range(100)]
 # for agent in agents:
 #     for i in range(200):
