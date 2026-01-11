@@ -121,7 +121,7 @@ class Network:
 
         r = random.random()
         cumulative = 0.0
-        
+
         for mutation, chance in mutations:
             cumulative += chance
             if r < cumulative:
@@ -136,6 +136,34 @@ class Network:
         for neuron in self.output_layer:
             neuron.calculate_value()
             self.output_values.append(neuron.value)
+
+    def clone_network(self):
+        new_network = Network(0, 0)
+
+        neuron_map = {}
+
+        new_network.layers = []
+        for layer in self.layers:
+            new_layer = []
+            for neuron in layer:
+                new_neuron = Neuron()
+                new_neuron.bias = neuron.bias
+                neuron_map[neuron] = new_neuron
+                new_layer.append(new_neuron)
+            new_network.layers.append(new_layer)
+
+        new_network.output_layer = []
+        for neuron in self.output_layer:
+            new_neuron = Neuron()
+            new_neuron.bias = neuron.bias
+            neuron_map[neuron] = new_neuron
+            new_network.output_layer.append(new_neuron)
+
+        for old_neuron, new_neuron in neuron_map.items():
+            for input_neuron, weight in old_neuron.input_conections:
+                new_neuron.add_conection(neuron_map[input_neuron], weight)
+        
+        return new_network
 
 class Neuron:
     def __init__(self):
@@ -160,7 +188,7 @@ class Neuron:
         for conection in self.input_conections:
             self.value += conection[0].value * conection[1]
         self.value = self.sigmoid(self.value)
-    
+
 # network1 = Network(3, 4)
 # input_values = [1,2,3]
 # network1.set_input_values(input_values)
