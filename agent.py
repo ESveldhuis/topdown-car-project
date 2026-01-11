@@ -31,11 +31,23 @@ class agent_class():
         self.score = 0
         self.game_over = False
 
-# agents = [agent_class() for _ in range(100)]
-# for agent in agents:
-#     for i in range(200):
-#         agent.cycle()
+agents = [agent_class() for _ in range(100)]
+for agent in agents:
+    i = 0
+    while not agent.game_over and i < 200:
+        agent.cycle()
+        i += 1
 
-# for agent in agents:
-#     agent.render_game()
-#     time.sleep(0.2)
+agents.sort(key=lambda agent: agent.score, reverse=True)
+
+for agent in agents:
+    if agent.score < 99:
+        break
+    agent.reset_game()
+    i = 0
+    while not agent.game_over and i < 500:
+        agent.cycle()
+        agent.render_game()
+        time.sleep(0.05)
+        i += 1
+    time.sleep(0.5)
