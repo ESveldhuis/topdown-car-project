@@ -21,6 +21,9 @@ class Agent():
             for i in range(len(self.posible_actions)):
                 if self.network.output_layer[i].value > 0.5:
                     self.car_pos, self.car_angle, self.score, self.game_over = self.posible_actions[i](self.car_pos, self.car_angle, self.score)
+    
+    def mutate(self):
+        self.network.mutate()
 
     def render_game(self):
         game.render_game(self.car_pos, self.car_angle)
