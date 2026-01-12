@@ -54,10 +54,10 @@ def run_generation(generation, max_game_cycles):
             game_cycle +=1
     generation.sort(key=lambda agent: agent.score, reverse=True)
 
-def show_top_agents_from_generation(generation, amount):
+def show_top_agents_from_generation(generation, amount, max_game_cycles):
     for i in range(amount):
         agent = generation[i]
-        agent.render_full_game(500)
+        agent.render_full_game(max_game_cycles)
         time.sleep(0.5)
 
 def create_next_generation(current_generation):
@@ -80,7 +80,7 @@ TOTAL_GENERATIONS = 25
 current_generation = [Agent() for _ in range(100)]
 for generation_number in range(TOTAL_GENERATIONS):
     run_generation(current_generation, 200 + generation_number*100)
-    show_top_agents_from_generation(current_generation, 1)
+    show_top_agents_from_generation(current_generation, 1, 200 + generation_number*100)
     current_generation = create_next_generation(current_generation)
 
 # show_top_agents_from_generation(current_generation, 5)
