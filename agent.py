@@ -8,6 +8,7 @@ class Agent():
         self.car_angle = 180
         self.score = 0
         self.game_over = False
+        self.generation_number = 1
         self.network = Network(5, 4)
         for i in range(10):
             self.network.mutate()
@@ -26,7 +27,7 @@ class Agent():
         self.network.mutate()
 
     def render_game(self):
-        game.render_game(self.car_pos, self.car_angle)
+        game.render_game(self.car_pos, self.car_angle, self.generation_number)
 
     def render_full_game(self, max_game_cycles):
         self.reset_game()
@@ -63,11 +64,13 @@ def create_next_generation(current_generation):
     next_generation = []
     for i in range(10):
         agent = current_generation[i]
+        agent.generation_number += 1
         next_generation.append(agent)
         for _ in range(9):
             mutated_agent = Agent()
             mutated_agent.network = agent.network.clone_network()
             mutated_agent.mutate()
+            mutated_agent.generation_number = agent.generation_number
             next_generation.append(mutated_agent)
     return next_generation
 
@@ -75,8 +78,8 @@ def create_next_generation(current_generation):
 TOTAL_GENERATIONS = 25
 
 current_generation = [Agent() for _ in range(100)]
-for gen in range(TOTAL_GENERATIONS):
-    run_generation(current_generation, 200 + gen*100)
+for generation_number in range(TOTAL_GENERATIONS):
+    run_generation(current_generation, 200 + generation_number*100)
     show_top_agents_from_generation(current_generation, 1)
     current_generation = create_next_generation(current_generation)
 

@@ -10,9 +10,11 @@ WIDTH, HEIGHT = 800, 600
 BG_COLOR = (30, 100, 30)
 ROAD_COLOR = (60, 60, 60)
 CAR_COLOR = (0, 200, 200)
+TEXT_COLOR = (255, 255, 255)
 MOVE_SPEED = 3
 TURN_SPEED = 3
 CAR_SIZE = 6
+font = pygame.font.Font(None, 20)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Topdown Car Simulation")
@@ -170,10 +172,13 @@ def get_input(personal_car_pos, personal_car_angle):
         ray += 20
     return input_values
 
-def render_game(personal_car_pos, personal_car_angle):
+def render_game(personal_car_pos, personal_car_angle, generation_number):
     screen.fill(BG_COLOR)
     draw_road()
     draw_car(personal_car_pos, personal_car_angle)
+    text_string = "generation: " + str(generation_number)
+    text = font.render(text_string, True, TEXT_COLOR)
+    screen.blit(text, (10, 10))
     pygame.display.flip()
     return get_input(personal_car_pos, personal_car_angle)
 
@@ -184,9 +189,11 @@ if __name__ == "__main__":
     score = 0
     game_over = False
     running = True
+    text = font.render("human player", True, TEXT_COLOR)
     while running and not game_over:
         clock.tick(30)
         screen.fill(BG_COLOR)
+        screen.blit(text, (10, 10))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
