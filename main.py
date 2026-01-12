@@ -180,7 +180,11 @@ def render_game(personal_car_pos, personal_car_angle, generation_number):
     text = font.render(text_string, True, TEXT_COLOR)
     screen.blit(text, (10, 10))
     pygame.display.flip()
-    return get_input(personal_car_pos, personal_car_angle)
+    quit = False
+    for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit = True
+    return quit
 
 if __name__ == "__main__":
     clock = pygame.time.Clock()

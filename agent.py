@@ -27,16 +27,18 @@ class Agent():
         self.network.mutate()
 
     def render_game(self):
-        game.render_game(self.car_pos, self.car_angle, self.generation_number)
+        return game.render_game(self.car_pos, self.car_angle, self.generation_number)
 
     def render_full_game(self, max_game_cycles):
         self.reset_game()
         game_cycle = 0
-        while not self.game_over and game_cycle < max_game_cycles:
+        quit = False
+        while not self.game_over and game_cycle < max_game_cycles and not quit:
             self.cycle()
-            self.render_game()
+            quit = self.render_game()
             time.sleep(0.03)
             game_cycle += 1
+        return quit
 
     def reset_game(self):
         self.car_pos = [400, 85]
@@ -57,8 +59,11 @@ def run_generation(generation, max_game_cycles):
 def show_top_agents_from_generation(generation, amount, max_game_cycles):
     for i in range(amount):
         agent = generation[i]
-        agent.render_full_game(max_game_cycles)
+        quit = agent.render_full_game(max_game_cycles)
+        if quit:
+            break
         time.sleep(0.5)
+    return quit
 
 def create_next_generation(current_generation):
     next_generation = []
@@ -80,7 +85,9 @@ TOTAL_GENERATIONS = 25
 current_generation = [Agent() for _ in range(100)]
 for generation_number in range(TOTAL_GENERATIONS):
     run_generation(current_generation, 200 + generation_number*100)
-    show_top_agents_from_generation(current_generation, 1, 200 + generation_number*100)
+    quit = show_top_agents_from_generation(current_generation, 1, 200 + generation_number*100)
+    if quit:
+        break
     current_generation = create_next_generation(current_generation)
 
 # show_top_agents_from_generation(current_generation, 5)
