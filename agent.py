@@ -89,5 +89,3 @@ for generation_number in range(TOTAL_GENERATIONS):
     if quit:
         break
     current_generation = create_next_generation(current_generation)
-
-# show_top_agents_from_generation(current_generation, 5)
